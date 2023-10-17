@@ -4,6 +4,7 @@ package me.bannock.assaultcube;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import me.bannock.memory.ExecutableApi;
+import me.bannock.memory.jna.JnaGuiceModule;
 
 public class AssaultCube {
 
@@ -14,6 +15,7 @@ public class AssaultCube {
         this.executableApi = executableApi;
     }
 
+    @SuppressWarnings("")
     public void run() {
         try {
             executableApi.connectToExecutable("ac_client.exe");
@@ -29,7 +31,7 @@ public class AssaultCube {
     }
 
     public static void main(String[] args) {
-        Guice.createInjector(new AssaultCubeModule()).getInstance(AssaultCube.class).run();
+        Guice.createInjector(new JnaGuiceModule(), new AssaultCubeModule()).getInstance(AssaultCube.class).run();
     }
 
 }

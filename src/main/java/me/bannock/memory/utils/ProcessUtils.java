@@ -1,4 +1,4 @@
-package me.bannock.assaultcube.utils;
+package me.bannock.memory.utils;
 
 import java.io.IOException;
 import java.util.*;

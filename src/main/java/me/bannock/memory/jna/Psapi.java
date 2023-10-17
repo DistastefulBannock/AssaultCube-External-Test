@@ -1,4 +1,4 @@
-package me.bannock.assaultcube.jna;
+package me.bannock.memory.jna;
 
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinNT;

@@ -3,24 +3,32 @@ package me.bannock.assaultcube;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.sun.jna.Pointer;
-import me.bannock.assaultcube.game.GameApi;
+import com.sun.jna.platform.win32.WinNT;
+import me.bannock.memory.ExecutableApi;
+import me.bannock.memory.jna.Kernal32;
 
 import java.io.IOException;
 
 public class AssaultCube {
 
-    private final GameApi gameApi;
+    private final ExecutableApi executableApi;
 
     @Inject
-    public AssaultCube(GameApi gameApi){
-        this.gameApi = gameApi;
+    public AssaultCube(ExecutableApi executableApi){
+        this.executableApi = executableApi;
     }
 
     public void run() {
         try {
-            gameApi.connectToGame("ac_client.exe");
-            System.out.println(Long.toHexString(Pointer.nativeValue(gameApi.getModuleHandle("ac_client.exe").getPointer())));
+            executableApi.connectToExecutable("ac_client.exe");
+//            System.out.println(Long.toHexString(Pointer.nativeValue(executableApi.getModuleHandle("ac_client.exe").getPointer())));
+            WinNT.HANDLE handle = executableApi.getExecutableHandle();
+
+            // print health
+            long pollUntil = System.currentTimeMillis() + 120000;
+            while (System.currentTimeMillis() < pollUntil){
+                System.out.println(executableApi.readInt(0x00840C04));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

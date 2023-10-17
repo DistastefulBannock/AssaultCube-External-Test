@@ -2,10 +2,10 @@ package me.bannock.assaultcube;
 
 import com.google.inject.AbstractModule;
 import com.sun.jna.Native;
-import me.bannock.assaultcube.game.GameApi;
-import me.bannock.assaultcube.game.GameApiImpl;
-import me.bannock.assaultcube.jna.Kernal32;
-import me.bannock.assaultcube.jna.Psapi;
+import me.bannock.memory.ExecutableApi;
+import me.bannock.memory.ExecutableApiImpl;
+import me.bannock.memory.jna.Kernal32;
+import me.bannock.memory.jna.Psapi;
 
 public class AssaultCubeModule extends AbstractModule {
 
@@ -16,6 +16,6 @@ public class AssaultCubeModule extends AbstractModule {
         bind(Psapi.class).toInstance(Native.load("psapi", Psapi.class));
 
         // Actual application
-        bind(GameApi.class).to(GameApiImpl.class).asEagerSingleton();
+        bind(ExecutableApi.class).to(ExecutableApiImpl.class).asEagerSingleton();
     }
 }

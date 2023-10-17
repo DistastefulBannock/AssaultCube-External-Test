@@ -9,7 +9,7 @@ public interface ExecutableApi {
     /**
      * Attaches to an executable with the given name.
      * @param executableName The name of the executable;
-     * @throws RuntimeException If the attach failed.
+     * @throws RuntimeException If the attachment failed.
      */
     void connectToExecutable(String executableName) throws Exception;
 

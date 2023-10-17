@@ -54,7 +54,7 @@ public class ExecutableApiImpl implements ExecutableApi {
     }
 
     @Override
-    public WinDef.HMODULE getModuleHandle(String moduleName) {
+    public WinDef.HMODULE getModuleHandle(String moduleName) throws RuntimeException {
         if (executableHandle == null)
             throw new IllegalStateException("Must connect to executable before getting module handle!");
 

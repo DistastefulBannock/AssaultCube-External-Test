@@ -99,7 +99,7 @@ public class ExecutableApiImpl implements ExecutableApi {
     }
 
     @Override
-    public short readShort(long address) throws Exception {
+    public short readShort(long address) {
         Memory buffer = readMemory(address, 2);
         short readValue = buffer.getShort(0);
         buffer.close();
@@ -107,7 +107,7 @@ public class ExecutableApiImpl implements ExecutableApi {
     }
 
     @Override
-    public int readInt(long address) throws Exception {
+    public int readInt(long address) {
         Memory buffer = readMemory(address, 4);
         int readValue = buffer.getInt(0);
         buffer.close();
@@ -115,7 +115,7 @@ public class ExecutableApiImpl implements ExecutableApi {
     }
 
     @Override
-    public long readLong(long address) throws Exception {
+    public long readLong(long address) {
         Memory buffer = readMemory(address, 8);
         long readValue = buffer.getLong(0);
         buffer.close();
@@ -123,12 +123,12 @@ public class ExecutableApiImpl implements ExecutableApi {
     }
 
     @Override
-    public String readString(long address, int length) throws Exception {
+    public String readString(long address, int length) {
         return readString(address, length, "UTF-8");
     }
 
     @Override
-    public String readString(long address, int length, String encoding) throws Exception {
+    public String readString(long address, int length, String encoding){
         Memory buffer = readMemory(address, length);
         String readValue = buffer.getString(0, encoding);
         buffer.close();
@@ -136,7 +136,7 @@ public class ExecutableApiImpl implements ExecutableApi {
     }
 
     @Override
-    public String readWideString(long address, int length) throws Exception {
+    public String readWideString(long address, int length) {
         Memory buffer = readMemory(address, length);
         String readValue = buffer.getWideString(0);
         buffer.close();

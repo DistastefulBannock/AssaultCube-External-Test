@@ -3,10 +3,7 @@ package me.bannock.assaultcube;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.sun.jna.platform.win32.WinNT;
 import me.bannock.memory.ExecutableApi;
-
-import java.io.IOException;
 
 public class AssaultCube {
 

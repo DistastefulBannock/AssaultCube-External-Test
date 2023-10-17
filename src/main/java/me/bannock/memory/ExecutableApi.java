@@ -35,42 +35,37 @@ public interface ExecutableApi {
      * @param address The address to read from
      * @param size The amount of bytes to read into
      * @return The memory read
-     * @throws Exception If something went wrong while reading the memory
      */
-    Memory readMemory(long address, int size) throws Exception;
+    Memory readMemory(long address, int size);
 
     /**
      * Reads a short from the executable (2 bytes)
      * @param address The address to read from
      * @return The short read
-     * @throws Exception If something went wrong while reading the memory
      */
-    short readShort(long address) throws Exception;
+    short readShort(long address);
 
     /**
      * Reads an integer from the executable  (4 bytes)
      * @param address The address to read from
      * @return The integer read
-     * @throws Exception If something went wrong while reading the memory
      */
-    int readInt(long address) throws Exception;
+    int readInt(long address);
 
     /**
      * Reads a long from the executable  (8 bytes)
      * @param address The address to read from
      * @return The long read
-     * @throws Exception If something went wrong while reading the memory
      */
-    long readLong(long address) throws Exception;
+    long readLong(long address);
 
     /**
      * Reads a String from the executable
      * @param address The address to read from
      * @param length The length of the String to read
      * @return The String read
-     * @throws Exception If something went wrong while reading the memory
      */
-    String readString(long address, int length) throws Exception;
+    String readString(long address, int length);
 
     /**
      * Reads a String from the executable
@@ -78,17 +73,15 @@ public interface ExecutableApi {
      * @param length The length of the String to read
      * @param encoding The encoding of the String
      * @return The String read
-     * @throws Exception If something went wrong while reading the memory
      */
-    String readString(long address, int length, String encoding) throws Exception;
+    String readString(long address, int length, String encoding);
 
     /**
      * Reads a wide String from the executable
      * @param address The address to read from
      * @param length The length of the String to read
      * @return The String read
-     * @throws Exception If something went wrong while reading the memory
      */
-    String readWideString(long address, int length) throws Exception;
+    String readWideString(long address, int length);
 
 }

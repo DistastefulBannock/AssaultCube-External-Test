@@ -1,9 +1,11 @@
-package me.bannock.memory.jna;
+package me.bannock.memory;
 
 import com.google.inject.AbstractModule;
 import com.sun.jna.Native;
+import me.bannock.memory.jna.Kernal32;
+import me.bannock.memory.jna.Psapi;
 
-public class JnaGuiceModule extends AbstractModule {
+public class MemoryGuiceModule extends AbstractModule {
 
     @Override
     protected void configure() {

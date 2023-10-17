@@ -4,7 +4,7 @@ package me.bannock.assaultcube;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import me.bannock.memory.ExecutableApi;
-import me.bannock.memory.jna.JnaGuiceModule;
+import me.bannock.memory.MemoryGuiceModule;
 
 public class AssaultCube {
 
@@ -31,7 +31,7 @@ public class AssaultCube {
     }
 
     public static void main(String[] args) {
-        Guice.createInjector(new JnaGuiceModule(), new AssaultCubeModule()).getInstance(AssaultCube.class).run();
+        Guice.createInjector(new MemoryGuiceModule(), new AssaultCubeModule()).getInstance(AssaultCube.class).run();
     }
 
 }

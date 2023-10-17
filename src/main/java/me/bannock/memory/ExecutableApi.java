@@ -18,7 +18,7 @@ public interface ExecutableApi {
      * @return The handle for the executable
      * @throws Exception if the executable handle has not been found
      */
-    WinNT.HANDLE getExecutableHandle() throws Exception;
+    WinNT.HANDLE getExecutableHandle();
 
     /**
      * Gets the handle for a specific module
@@ -27,7 +27,7 @@ public interface ExecutableApi {
      * @throws RuntimeException If the module handle could not be found.
      *                   Call GetLastError() for more information.
      */
-    WinDef.HMODULE getModuleHandle(String moduleName) throws Exception;
+    WinDef.HMODULE getModuleHandle(String moduleName);
 
     /**
      * Reads memory from the executable.

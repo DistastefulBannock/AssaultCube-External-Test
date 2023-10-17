@@ -47,14 +47,14 @@ public class ExecutableApiImpl implements ExecutableApi {
     }
 
     @Override
-    public WinNT.HANDLE getExecutableHandle() throws Exception {
+    public WinNT.HANDLE getExecutableHandle() {
         if (executableHandle == null)
             throw new IllegalStateException("Must connect to executable before getting handle; please run connectToExecutable() first.");
         return executableHandle;
     }
 
     @Override
-    public WinDef.HMODULE getModuleHandle(String moduleName) throws Exception {
+    public WinDef.HMODULE getModuleHandle(String moduleName) {
         if (executableHandle == null)
             throw new IllegalStateException("Must connect to executable before getting module handle!");
 

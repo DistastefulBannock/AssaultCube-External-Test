@@ -34,7 +34,7 @@ public class ExecutableApiImpl implements ExecutableApi {
     }
 
     @Override
-    public boolean connectToExecutable(String executableName) throws Exception {
+    public void connectToExecutable(String executableName) throws Exception {
         Map<String, List<Integer>> processes = ProcessUtils.getRunningProcesses();
         if (!processes.containsKey(executableName)) {
             throw new RuntimeException(STR."Could not find \{executableName} running!");
@@ -44,7 +44,6 @@ public class ExecutableApiImpl implements ExecutableApi {
         }
         int pid = processes.get(executableName).get(0);
         executableHandle = kernal32.OpenProcess(Kernal32.PROCESS_ALL_ACCESS, false, pid);
-        return true;
     }
 
     @Override

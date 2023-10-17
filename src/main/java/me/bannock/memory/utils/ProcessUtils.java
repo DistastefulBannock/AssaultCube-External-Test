@@ -9,7 +9,7 @@ public class ProcessUtils {
         Map<String, List<Integer>> processes = new HashMap<>();
 
         // Run tasklist.exe to get a list of all processes
-        Process process = Runtime.getRuntime().exec("tasklist.exe");
+        Process process = new ProcessBuilder().command("tasklist.exe").start();
 
         // Capture the output and extract wanted data
         Scanner scanner = new Scanner(process.getInputStream());

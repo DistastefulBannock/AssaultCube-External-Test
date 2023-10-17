@@ -9,10 +9,9 @@ public interface ExecutableApi {
     /**
      * Attaches to an executable with the given name.
      * @param executableName The name of the executable;
-     * @return True if the attach was successful, false otherwise.
      * @throws RuntimeException If the attach failed.
      */
-    boolean connectToExecutable(String executableName) throws Exception;
+    void connectToExecutable(String executableName) throws Exception;
 
     /**
      * Gets the handle for the executable

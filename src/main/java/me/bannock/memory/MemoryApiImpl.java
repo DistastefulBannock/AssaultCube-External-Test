@@ -9,90 +9,109 @@ import me.bannock.memory.jna.Kernal32;
 import me.bannock.memory.jna.Psapi;
 import me.bannock.memory.utils.ProcessUtils;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static java.lang.StringTemplate.STR;
 
-public class ExecutableApiImpl implements ExecutableApi {
+public class MemoryApiImpl implements MemoryApi {
 
     private static final int ARRAY_SIZE = 2048;
+    private static final String NOT_BOUND_TO_EXECUTABLE_ERROR = "Must bind to executable first! Please run the bindToExecutable method";
+    private static final String ALREADY_BOUND_TO_EXECUTABLE_ERROR = "Already bound to executable!";
 
     private final Kernal32 kernal32;
     private final Psapi psapi;
-    private final Map<String, WinDef.HMODULE> moduleHandles;
+    private final Map<String, WinDef.HMODULE> moduleHandlePool;
 
     private WinNT.HANDLE executableHandle = null;
 
     @Inject
-    public ExecutableApiImpl(Kernal32 kernal32, Psapi psapi){
+    public MemoryApiImpl(Kernal32 kernal32, Psapi psapi){
         this.kernal32 = kernal32;
         this.psapi = psapi;
 
-        moduleHandles = new HashMap<>();
+        moduleHandlePool = new HashMap<>();
     }
 
     @Override
-    public void connectToExecutable(String executableName) throws Exception {
-        Map<String, List<Integer>> processes = ProcessUtils.getRunningProcesses();
+    public void bindToExecutable(String executableName) throws RuntimeException {
+        if (executableHandle != null)
+            throw new IllegalStateException(ALREADY_BOUND_TO_EXECUTABLE_ERROR);
+
+        // First, get the running processes
+        Map<String, List<Integer>> processes;
+        try{
+            processes = ProcessUtils.getRunningProcesses();
+        } catch (IOException e) {
+            throw new RuntimeException(STR."Something went wrong while searching for \{executableName}.", e);
+        }
+
+        // Check if the running processes contains the one we're looking for, if not throw exception
         if (!processes.containsKey(executableName)) {
             throw new RuntimeException(STR."Could not find \{executableName} running!");
         }
+
+        // Multiple instances of the executable may be running; if so we first inform the user that we'll be choosing the first one
         if (processes.get(executableName).size() > 1){
             System.out.println(STR."Multiple instances of \{executableName} are running, choosing first one.");
         }
         int pid = processes.get(executableName).get(0);
+
+        // Get and store the handle
         executableHandle = kernal32.OpenProcess(Kernal32.PROCESS_ALL_ACCESS, false, pid);
     }
 
     @Override
     public WinNT.HANDLE getExecutableHandle() {
         if (executableHandle == null)
-            throw new IllegalStateException("Must connect to executable before getting handle; please run connectToExecutable() first.");
+            throw new IllegalStateException(NOT_BOUND_TO_EXECUTABLE_ERROR);
         return executableHandle;
     }
 
     @Override
     public WinDef.HMODULE getModuleHandle(String moduleName) throws RuntimeException {
         if (executableHandle == null)
-            throw new IllegalStateException("Must connect to executable before getting module handle!");
+            throw new IllegalStateException(NOT_BOUND_TO_EXECUTABLE_ERROR);
 
         // Get handle if already found
-        if (moduleHandles.containsKey(moduleName))
-            return moduleHandles.get(moduleName);
+        if (moduleHandlePool.containsKey(moduleName))
+            return moduleHandlePool.get(moduleName);
 
         // Find handle
-        WinDef.HMODULE moduleHandle = null;
-        WinDef.HMODULE[] modules = new WinDef.HMODULE[ARRAY_SIZE];
-        IntByReference bytesNeededToStore = new IntByReference();
-        psapi.EnumProcessModules(executableHandle, modules, modules.length, bytesNeededToStore);
+        WinDef.HMODULE moduleHandle = null; // This variable is where we store the desired handle
+        WinDef.HMODULE[] modules = new WinDef.HMODULE[ARRAY_SIZE]; // This will be populated with all modules loaded by the executable
+        psapi.EnumProcessModules(executableHandle, modules, modules.length, new IntByReference()); // Grab loaded modules
         // Search through all loaded modules for the one we want
         for (WinDef.HMODULE module : modules){
+            // We use this char array as a buffer to load the module base name
             char[] name = new char[ARRAY_SIZE];
             int lengthInBuffer = psapi.GetModuleBaseNameW(executableHandle, module, name, 2048);
-            if (lengthInBuffer == 0)
+            if (lengthInBuffer == 0) // 0 means something went wrong
                 continue;
-            String tmpModuleName = new String(name).substring(0, lengthInBuffer);
-            if (tmpModuleName.equals(moduleName)){
-                moduleHandle = module;
+
+            // Check if it's a match
+            if (new String(name).substring(0, lengthInBuffer).equals(moduleName)){
+                moduleHandle = module; // Matched; write and break!
                 break;
             }
         }
 
-        // Check if found
+        // Should still be null if the handle was not found
         if (moduleHandle == null)
             throw new RuntimeException(STR."Could not find module handle for \{moduleName}");
 
-        // Cache and return
-        moduleHandles.put(moduleName, moduleHandle);
+        // Add to pool and return
+        moduleHandlePool.put(moduleName, moduleHandle); // We pool because bad devs don't know to store the handle in a variable
         return moduleHandle;
     }
 
     @Override
     public Memory readMemory(long address, int size) {
         if (executableHandle == null)
-            throw new IllegalStateException("Must connect to executable before reading memory!");
+            throw new IllegalStateException(NOT_BOUND_TO_EXECUTABLE_ERROR);
         Memory memory = new Memory(size);
         kernal32.ReadProcessMemory(executableHandle, new com.sun.jna.Pointer(address), memory, size);
         return memory;

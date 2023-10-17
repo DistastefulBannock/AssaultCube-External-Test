@@ -4,14 +4,14 @@ import com.sun.jna.Memory;
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinNT;
 
-public interface ExecutableApi {
+public interface MemoryApi {
 
     /**
      * Attaches to an executable with the given name.
      * @param executableName The name of the executable;
      * @throws RuntimeException If the attachment failed.
      */
-    void connectToExecutable(String executableName) throws Exception;
+    void bindToExecutable(String executableName) throws RuntimeException;
 
     /**
      * Gets the handle for the executable

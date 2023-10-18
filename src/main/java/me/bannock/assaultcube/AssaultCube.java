@@ -19,13 +19,14 @@ public class AssaultCube {
     public void run() {
         try {
             memoryApi.bindToExecutable("ac_client.exe");
+            memoryApi.setPointerSize(4);
 
             // print health
             long pollUntil = System.currentTimeMillis() + 120000;
             while (System.currentTimeMillis() < pollUntil){
-//                System.out.println("Health: " + memoryApi.readInt(
-//                        memoryApi.processOffsets("ac_client.exe", 0x0017F110, 0x0, 0xEC)
-//                ));
+                System.out.println("Health: " + memoryApi.readInt(
+                        memoryApi.processOffsets("ac_client.exe", 0x0017F110, 0x0, 0xEC)
+                ));
                 TestStruct testStruct = new TestStruct(memoryApi, memoryApi.processOffsets("ac_client.exe", 0x0017F110, 0x0, 0xEC));
                 System.out.println(testStruct.getHealth());
             }

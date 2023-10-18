@@ -124,6 +124,17 @@ public class MemoryApiImpl implements MemoryApi {
     }
 
     @Override
+    public long readPointer(long address) {
+        // We read different amounts depending on the pointer size used for the program
+        return switch (pointerSize){
+            case 2 -> readShort(address);
+            case 4 -> readInt(address);
+            case 8 -> readLong(address);
+            default -> throw new IllegalStateException(INVALID_POINTER_SIZE);
+        };
+    }
+
+    @Override
     public Memory readMemory(long address, int size) {
         if (executableHandle == null)
             throw new IllegalStateException(NOT_BOUND_TO_EXECUTABLE_ERROR);
@@ -187,22 +198,8 @@ public class MemoryApiImpl implements MemoryApi {
 
         // Go through every offset to find the final address
         for (long offset : offsets){
-
-            // We read different amounts depending on the pointer size used for the program
-            switch (pointerSize){
-                case 2:{
-                    address = readShort(address);
-                }break;
-                case 4:{
-                    address = readInt(address);
-                }break;
-                case 8:{
-                    address = readLong(address);
-                }break;
-                default:
-                    throw new IllegalStateException(INVALID_POINTER_SIZE);
-            }
-
+            // Dereference pointer
+            address = readPointer(address);
             // Add next offset
             address += offset;
         }
@@ -210,4 +207,5 @@ public class MemoryApiImpl implements MemoryApi {
         // Return the final offset
         return address;
     }
+
 }

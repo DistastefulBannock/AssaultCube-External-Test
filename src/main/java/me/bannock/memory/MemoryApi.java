@@ -52,6 +52,13 @@ public interface MemoryApi {
     Memory readMemory(long address, int size);
 
     /**
+     * Reads a pointer from the given address, accounts for pointer size
+     * @param address The address to read from
+     * @return The pointer read
+     */
+    long readPointer(long address);
+
+    /**
      * Reads a short from the executable (2 bytes)
      * @param address The address to read from
      * @return The short read

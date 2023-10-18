@@ -12,7 +12,7 @@ public class StructEntity extends StructMapper {
     private int health;
 
     public StructEntity(MemoryApi memoryApi, long address) {
-        startMapping(memoryApi, address, 0xBC);
+        startMapping(memoryApi, address, 0xC0);
     }
 
     @Override
@@ -34,11 +34,11 @@ public class StructEntity extends StructMapper {
         int32_t health; //0x00BC
         */
         assistant.skip(4);
-        eyePos = new StructVec3(assistant.getMemoryApi(), assistant.readPointer());
-        motion = new StructVec3(assistant.getMemoryApi(), assistant.readPointer());
+        eyePos = new StructVec3(assistant.getMemoryApi(), assistant.getAddress(12));
+        motion = new StructVec3(assistant.getMemoryApi(), assistant.getAddress(12));
         assistant.skip(12);
-        pos = new StructVec3(assistant.getMemoryApi(), assistant.readPointer());
-        rot = new StructVec3(assistant.getMemoryApi(), assistant.readPointer());
+        pos = new StructVec3(assistant.getMemoryApi(), assistant.getAddress(12));
+        rot = new StructVec3(assistant.getMemoryApi(), assistant.getAddress(12));
         recoil = assistant.readFloat();
         assistant.skip(8);
         fat = assistant.readFloat();

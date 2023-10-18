@@ -80,6 +80,20 @@ public interface MemoryApi {
     long readLong(long address);
 
     /**
+     * Reads a float from the executable
+     * @param address The address to read from
+     * @return The float read
+     */
+    float readFloat(long address);
+
+    /**
+     * Reads a double from the executable
+     * @param address The address to read from
+     * @return The double read
+     */
+    double readDouble(long address);
+
+    /**
      * Reads a String from the executable
      * @param address The address to read from
      * @param length The length of the String to read

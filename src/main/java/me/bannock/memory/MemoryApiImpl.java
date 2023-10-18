@@ -168,6 +168,22 @@ public class MemoryApiImpl implements MemoryApi {
     }
 
     @Override
+    public float readFloat(long address) {
+        Memory buffer = readMemory(address, 4);
+        float readValue = buffer.getFloat(0);
+        buffer.close();
+        return readValue;
+    }
+
+    @Override
+    public double readDouble(long address) {
+        Memory buffer = readMemory(address, 8);
+        double readValue = buffer.getFloat(0);
+        buffer.close();
+        return readValue;
+    }
+
+    @Override
     public String readString(long address, int length) {
         return readString(address, length, "UTF-8");
     }

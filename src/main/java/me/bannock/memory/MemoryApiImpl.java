@@ -21,14 +21,18 @@ public class MemoryApiImpl implements MemoryApi {
 
     private static final int ARRAY_SIZE = 2048;
     private static final String INVALID_POINTER_SIZE = "Invalid pointer size! Must be 2, 4, or 8.";
-    private static final String NOT_BOUND_TO_EXECUTABLE_ERROR = "Must bind to executable first! Please run the bindToExecutable method";
+    private static final String NOT_BOUND_TO_EXECUTABLE_ERROR = "Must bind to executable first! Please run the openHandle method";
     private static final String ALREADY_BOUND_TO_EXECUTABLE_ERROR = "Already bound to executable!";
+    private static final String NO_READ_PERMISSION = "Read permission not granted. Please open handle with PROCESS_VM_READ";
+    private static final String NO_WRITE_PERMISSION = "Write permission not granted. Please open handle with PROCESS_VM_WRITE";
 
     private final Kernal32 kernal32;
     private final Psapi psapi;
     private final Map<String, WinDef.HMODULE> moduleHandlePool;
 
     private int pointerSize = 4;
+    private boolean canRead = false;
+    private boolean canWrite = false;
     private WinNT.HANDLE executableHandle = null;
 
     @Inject
@@ -47,7 +51,7 @@ public class MemoryApiImpl implements MemoryApi {
     }
 
     @Override
-    public void bindToExecutable(String executableName) throws RuntimeException {
+    public void openHandle(String executableName, int access) throws RuntimeException {
         if (executableHandle != null)
             throw new IllegalStateException(ALREADY_BOUND_TO_EXECUTABLE_ERROR);
 
@@ -71,7 +75,10 @@ public class MemoryApiImpl implements MemoryApi {
         int pid = processes.get(executableName).get(0);
 
         // Get and store the handle
-        executableHandle = kernal32.OpenProcess(Kernal32.PROCESS_ALL_ACCESS, false, pid);
+        executableHandle = kernal32.OpenProcess(access, false, pid);
+        canRead = (access & 0x0010) == 0x0010;
+        canWrite = (access & 0x0020) == 0x0020;
+
     }
 
     @Override
@@ -111,7 +118,13 @@ public class MemoryApiImpl implements MemoryApi {
 
         // Should still be null if the handle was not found
         if (moduleHandle == null)
-            throw new RuntimeException(STR."Could not find module handle for \{moduleName}");
+            throw new RuntimeException(
+                    STR."Could not find module handle for \{moduleName}."
+                    + STR." Last error: \{kernal32.GetLastError()}"
+                    + (kernal32.GetLastError() == 5 ?
+                            STR.".\nYou may need PROCESS_QUERY_LIMITED_INFORMATION " +
+                                    "or PROCESS_QUERY_INFORMATION" : "")
+            );
 
         // Add to pool and return
         moduleHandlePool.put(moduleName, moduleHandle); // We pool because bad devs don't know to store the handle in a variable
@@ -138,9 +151,30 @@ public class MemoryApiImpl implements MemoryApi {
     public Memory readMemory(long address, int size) {
         if (executableHandle == null)
             throw new IllegalStateException(NOT_BOUND_TO_EXECUTABLE_ERROR);
+        if (!canRead)
+            throw new IllegalStateException(NO_READ_PERMISSION);
+
+        // Finally read the memory
         Memory memory = new Memory(size);
         kernal32.ReadProcessMemory(executableHandle, new com.sun.jna.Pointer(address), memory, size);
         return memory;
+    }
+
+    @Override
+    public byte readByte(long address) {
+        try{
+            return readBytes(address, 1)[0];
+        }catch (IndexOutOfBoundsException e){
+            throw new RuntimeException("Could not read byte at address " + address + ".");
+        }
+    }
+
+    @Override
+    public byte[] readBytes(long address, int size) {
+        Memory buffer = readMemory(address, 2);
+        byte[] readValue = buffer.getByteArray(0, size);
+        buffer.close();
+        return readValue;
     }
 
     @Override
@@ -205,8 +239,8 @@ public class MemoryApiImpl implements MemoryApi {
     }
 
     @Override
-    public long processOffsets(String moduleName, long firstAddress, long... offsets) throws RuntimeException {
-        return processOffsets(getModuleBaseAddress(moduleName) + firstAddress, offsets); // Just makes it take slightly less work
+    public boolean readBoolean(long address) {
+        return readByte(address) == 1;
     }
 
     @Override
@@ -222,6 +256,21 @@ public class MemoryApiImpl implements MemoryApi {
 
         // Return the final offset
         return address;
+    }
+
+    @Override
+    public boolean hasReadPermission() {
+        return canRead;
+    }
+
+    @Override
+    public boolean hasWritePermission() {
+        return canWrite;
+    }
+
+    @Override
+    public int getPointerSize() {
+        return pointerSize;
     }
 
 }

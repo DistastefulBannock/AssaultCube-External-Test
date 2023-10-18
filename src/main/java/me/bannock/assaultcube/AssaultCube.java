@@ -3,7 +3,8 @@ package me.bannock.assaultcube;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
-import me.bannock.assaultcube.structs.TestStruct;
+import me.bannock.assaultcube.structs.entity.StructEntity;
+import me.bannock.assaultcube.structs.entity.StructEntityVector;
 import me.bannock.memory.MemoryApi;
 import me.bannock.memory.MemoryGuiceModule;
 
@@ -18,17 +19,24 @@ public class AssaultCube {
 
     public void run() {
         try {
-            memoryApi.bindToExecutable("ac_client.exe");
+            memoryApi.openHandle("ac_client.exe");
             memoryApi.setPointerSize(4);
 
             // print health
             long pollUntil = System.currentTimeMillis() + 120000;
             while (System.currentTimeMillis() < pollUntil){
-                System.out.println("Health: " + memoryApi.readInt(
-                        memoryApi.processOffsets("ac_client.exe", 0x0017F110, 0x0, 0xEC)
-                ));
-                TestStruct testStruct = new TestStruct(memoryApi, memoryApi.processOffsets("ac_client.exe", 0x0017F110, 0x0, 0xEC));
-                System.out.println(testStruct.getHealth());
+//                System.out.println("Health: " + memoryApi.readInt(
+//                        memoryApi.processOffsets("ac_client.exe", 0x0017F110, 0x0, 0xEC)
+//                ));
+                StructEntityVector entities = new StructEntityVector(memoryApi,
+                        memoryApi.processOffsets("ac_client.exe", 0x18AC04));
+                System.out.println(entities.getEntityCount() + "/" + entities.getMaxEntityCount()
+                    + " players");
+                for (StructEntity entity : entities.getEntities()){
+                    if (entity == null)
+                        continue;
+                    System.out.println(entity.getHealth() + "HP - " + entity.getPosition());
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

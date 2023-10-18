@@ -166,7 +166,7 @@ public class MemoryApiImpl implements MemoryApi {
         Memory buffer = readMemory(address, length);
         String readValue = buffer.getString(0, encoding);
         buffer.close();
-        return readValue;
+        return readValue.intern();
     }
 
     @Override
@@ -174,17 +174,21 @@ public class MemoryApiImpl implements MemoryApi {
         Memory buffer = readMemory(address, length);
         String readValue = buffer.getWideString(0);
         buffer.close();
-        return readValue;
+        return readValue.intern();
     }
 
     @Override
     public long processOffsets(String moduleName, long firstAddress, long... offsets) throws RuntimeException {
-        return processOffsets(getModuleBaseAddress(moduleName) + firstAddress, offsets);
+        return processOffsets(getModuleBaseAddress(moduleName) + firstAddress, offsets); // Just makes it take slightly less work
     }
 
     @Override
     public long processOffsets(long address, long... offsets) {
+
+        // Go through every offset to find the final address
         for (long offset : offsets){
+
+            // We read different amounts depending on the pointer size used for the program
             switch (pointerSize){
                 case 2:{
                     address = readShort(address);
@@ -198,8 +202,12 @@ public class MemoryApiImpl implements MemoryApi {
                 default:
                     throw new IllegalStateException(INVALID_POINTER_SIZE);
             }
+
+            // Add next offset
             address += offset;
         }
+
+        // Return the final offset
         return address;
     }
 }

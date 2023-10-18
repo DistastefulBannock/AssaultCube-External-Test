@@ -29,7 +29,7 @@ public class MappingAssistant {
         this.offset += offset;
         if (this.offset > structSize)
             throw new RuntimeException("Offset is greater than struct size. " +
-                    "Is the struct size large enough?");
+                    STR."Struct size is \{structSize} but tried to read \{this.offset} bytes");
         return address + this.offset - offset;
     }
 

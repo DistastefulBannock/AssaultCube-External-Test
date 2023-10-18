@@ -13,7 +13,7 @@ public class TestStruct extends StructHelper {
     /**
      * Creates a new test struct
      * @param memoryApi The memory api to use
-     * @param address   The address of the struct
+     * @param address The address of the struct
      */
     public TestStruct(MemoryApi memoryApi, long address) {
         super(memoryApi, address, 8);

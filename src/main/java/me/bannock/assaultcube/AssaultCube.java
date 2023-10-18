@@ -23,7 +23,9 @@ public class AssaultCube {
             // print health
             long pollUntil = System.currentTimeMillis() + 120000;
             while (System.currentTimeMillis() < pollUntil){
-                System.out.println(memoryApi.readInt(0x00840C04));
+                System.out.println("Health: " + memoryApi.readInt(
+                        memoryApi.processOffsets("ac_client.exe", 0x0017F110, 0x0, 0xEC)
+                ));
             }
         } catch (Exception e) {
             e.printStackTrace();

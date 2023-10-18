@@ -7,6 +7,12 @@ import com.sun.jna.platform.win32.WinNT;
 public interface MemoryApi {
 
     /**
+     * Sets the pointer size to use for the system
+     * @param size The amount of bytes to use for a pointer
+     */
+    void setPointerSize(int size);
+
+    /**
      * Attaches to an executable with the given name.
      * @param executableName The name of the executable;
      * @throws RuntimeException If the attachment failed.
@@ -27,6 +33,14 @@ public interface MemoryApi {
      *                   Call GetLastError() for more information.
      */
     WinDef.HMODULE getModuleHandle(String moduleName) throws RuntimeException;
+
+    /**
+     * Gets the base address for a specific module
+     * @param moduleName The name of the module
+     * @return The base address for the module
+     * @throws RuntimeException If the module handle could not be found. Call GetLastError() for more information.
+     */
+    long getModuleBaseAddress(String moduleName) throws RuntimeException;
 
     /**
      * Reads memory from the executable.
@@ -82,5 +96,23 @@ public interface MemoryApi {
      * @return The String read
      */
     String readWideString(long address, int length);
+
+    /**
+     * Reads an offset and returns the resulting address
+     * @param moduleName The name of the module
+     * @param firstAddress The first address appended to the module base address
+     * @param offsets The offsets to read. Dereferences the last offset before reading the next
+     * @return The resulting address, not dereferenced
+     * @throws RuntimeException If the module handle could not be found. Call GetLastError() for more information.
+     */
+    long processOffsets(String moduleName, long firstAddress, long... offsets) throws RuntimeException;
+
+    /**
+     * Reads an offset and returns the resulting address
+     * @param address The address to read from
+     * @param offsets The offsets to read. Dereferences the last offset before reading the next
+     * @return The resulting address, not dereferenced
+     */
+    long processOffsets(long address, long... offsets);
 
 }

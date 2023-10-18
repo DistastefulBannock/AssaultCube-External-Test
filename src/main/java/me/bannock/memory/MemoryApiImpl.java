@@ -2,6 +2,7 @@ package me.bannock.memory;
 
 import com.google.inject.Inject;
 import com.sun.jna.Memory;
+import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.ptr.IntByReference;
@@ -19,6 +20,7 @@ import static java.lang.StringTemplate.STR;
 public class MemoryApiImpl implements MemoryApi {
 
     private static final int ARRAY_SIZE = 2048;
+    private static final String INVALID_POINTER_SIZE = "Invalid pointer size! Must be 2, 4, or 8.";
     private static final String NOT_BOUND_TO_EXECUTABLE_ERROR = "Must bind to executable first! Please run the bindToExecutable method";
     private static final String ALREADY_BOUND_TO_EXECUTABLE_ERROR = "Already bound to executable!";
 
@@ -26,6 +28,7 @@ public class MemoryApiImpl implements MemoryApi {
     private final Psapi psapi;
     private final Map<String, WinDef.HMODULE> moduleHandlePool;
 
+    private int pointerSize = 4;
     private WinNT.HANDLE executableHandle = null;
 
     @Inject
@@ -34,6 +37,13 @@ public class MemoryApiImpl implements MemoryApi {
         this.psapi = psapi;
 
         moduleHandlePool = new HashMap<>();
+    }
+
+    @Override
+    public void setPointerSize(int size) {
+        if (size != 2 && size != 4 && size != 8)
+            throw new IllegalArgumentException(INVALID_POINTER_SIZE);
+        pointerSize = size;
     }
 
     @Override
@@ -109,6 +119,11 @@ public class MemoryApiImpl implements MemoryApi {
     }
 
     @Override
+    public long getModuleBaseAddress(String moduleName) throws RuntimeException {
+        return Pointer.nativeValue(getModuleHandle(moduleName).getPointer());
+    }
+
+    @Override
     public Memory readMemory(long address, int size) {
         if (executableHandle == null)
             throw new IllegalStateException(NOT_BOUND_TO_EXECUTABLE_ERROR);
@@ -162,4 +177,29 @@ public class MemoryApiImpl implements MemoryApi {
         return readValue;
     }
 
+    @Override
+    public long processOffsets(String moduleName, long firstAddress, long... offsets) throws RuntimeException {
+        return processOffsets(getModuleBaseAddress(moduleName) + firstAddress, offsets);
+    }
+
+    @Override
+    public long processOffsets(long address, long... offsets) {
+        for (long offset : offsets){
+            switch (pointerSize){
+                case 2:{
+                    address = readShort(address);
+                }break;
+                case 4:{
+                    address = readInt(address);
+                }break;
+                case 8:{
+                    address = readLong(address);
+                }break;
+                default:
+                    throw new IllegalStateException(INVALID_POINTER_SIZE);
+            }
+            address += offset;
+        }
+        return address;
+    }
 }

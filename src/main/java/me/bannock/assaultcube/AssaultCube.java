@@ -30,7 +30,7 @@ public class AssaultCube {
                 StructEntityVector entities = new StructEntityVector(memoryApi,
                         memoryApi.processOffsets("ac_client.exe", 0x18AC00));
                 System.out.println(entities.getLocalPlayer().getHealth() + "HP\n" +
-                        entities.getLocalPlayer().getPosition());
+                        entities.getLocalPlayer().getPos());
             }
         } catch (Exception e) {
             e.printStackTrace();

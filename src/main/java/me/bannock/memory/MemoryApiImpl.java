@@ -171,50 +171,56 @@ public class MemoryApiImpl implements MemoryApi {
 
     @Override
     public byte[] readBytes(long address, int size) {
-        Memory buffer = readMemory(address, 2);
-        byte[] readValue = buffer.getByteArray(0, size);
-        buffer.close();
-        return readValue;
+        try(Memory buffer = readMemory(address, size)){
+            byte[] readValue = buffer.getByteArray(0, size);
+            buffer.close();
+            return readValue;
+        }
     }
 
     @Override
     public short readShort(long address) {
-        Memory buffer = readMemory(address, 2);
-        short readValue = buffer.getShort(0);
-        buffer.close();
-        return readValue;
+        try(Memory buffer = readMemory(address, 2)){
+            short readValue = buffer.getShort(0);
+            buffer.close();
+            return readValue;
+        }
     }
 
     @Override
     public int readInt(long address) {
-        Memory buffer = readMemory(address, 4);
-        int readValue = buffer.getInt(0);
-        buffer.close();
-        return readValue;
+        try(Memory buffer = readMemory(address, 4)){
+            int readValue = buffer.getInt(0);
+            buffer.close();
+            return readValue;
+        }
     }
 
     @Override
     public long readLong(long address) {
-        Memory buffer = readMemory(address, 8);
-        long readValue = buffer.getLong(0);
-        buffer.close();
-        return readValue;
+        try(Memory buffer = readMemory(address, 8)){
+            long readValue = buffer.getLong(0);
+            buffer.close();
+            return readValue;
+        }
     }
 
     @Override
     public float readFloat(long address) {
-        Memory buffer = readMemory(address, 4);
-        float readValue = buffer.getFloat(0);
-        buffer.close();
-        return readValue;
+        try(Memory buffer = readMemory(address, 4)){
+            float readValue = buffer.getFloat(0);
+            buffer.close();
+            return readValue;
+        }
     }
 
     @Override
     public double readDouble(long address) {
-        Memory buffer = readMemory(address, 8);
-        double readValue = buffer.getFloat(0);
-        buffer.close();
-        return readValue;
+        try(Memory buffer = readMemory(address, 8)){
+            double readValue = buffer.getFloat(0);
+            buffer.close();
+            return readValue;
+        }
     }
 
     @Override
@@ -224,18 +230,20 @@ public class MemoryApiImpl implements MemoryApi {
 
     @Override
     public String readString(long address, int length, String encoding){
-        Memory buffer = readMemory(address, length);
-        String readValue = buffer.getString(0, encoding);
-        buffer.close();
-        return readValue.intern();
+        try(Memory buffer = readMemory(address, length)){
+            String readValue = buffer.getString(0, encoding);
+            buffer.close();
+            return readValue.intern();
+        }
     }
 
     @Override
     public String readWideString(long address, int length) {
-        Memory buffer = readMemory(address, length);
-        String readValue = buffer.getWideString(0);
-        buffer.close();
-        return readValue.intern();
+        try(Memory buffer = readMemory(address, length)){
+            String readValue = buffer.getWideString(0);
+            buffer.close();
+            return readValue.intern();
+        }
     }
 
     @Override

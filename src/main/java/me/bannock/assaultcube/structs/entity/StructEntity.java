@@ -1,13 +1,13 @@
 package me.bannock.assaultcube.structs.entity;
 
-import me.bannock.assaultcube.structs.StructVec3;
+import me.bannock.assaultcube.structs.StructVector;
 import me.bannock.memory.MemoryApi;
 import me.bannock.memory.struct.StructMapper;
 import me.bannock.memory.struct.MappingAssistant;
 
 public class StructEntity extends StructMapper {
 
-    private StructVec3 eyePos, motion, pos, rot;
+    private StructVector eyePos, motion, pos, rot;
     private float recoil, fat, height, weight;
     private int health;
 
@@ -34,11 +34,11 @@ public class StructEntity extends StructMapper {
         int32_t health; //0x00BC
         */
         assistant.skip(4);
-        eyePos = new StructVec3(assistant.getMemoryApi(), assistant.getAddress(12));
-        motion = new StructVec3(assistant.getMemoryApi(), assistant.getAddress(12));
+        eyePos = new StructVector(assistant.getMemoryApi(), assistant.getAddress(12), 3);
+        motion = new StructVector(assistant.getMemoryApi(), assistant.getAddress(12), 3);
         assistant.skip(12);
-        pos = new StructVec3(assistant.getMemoryApi(), assistant.getAddress(12));
-        rot = new StructVec3(assistant.getMemoryApi(), assistant.getAddress(12));
+        pos = new StructVector(assistant.getMemoryApi(), assistant.getAddress(12), 3);
+        rot = new StructVector(assistant.getMemoryApi(), assistant.getAddress(12), 3);
         recoil = assistant.readFloat();
         assistant.skip(8);
         fat = assistant.readFloat();
@@ -48,19 +48,19 @@ public class StructEntity extends StructMapper {
         health = assistant.readInt();
     }
 
-    public StructVec3 getEyePos() {
+    public StructVector getEyePos() {
         return eyePos;
     }
 
-    public StructVec3 getMotion() {
+    public StructVector getMotion() {
         return motion;
     }
 
-    public StructVec3 getPos() {
+    public StructVector getPos() {
         return pos;
     }
 
-    public StructVec3 getRot() {
+    public StructVector getRot() {
         return rot;
     }
 
